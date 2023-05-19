@@ -4,45 +4,31 @@ import java.util.*;
 
 public class Solution {
     public boolean isBipartite(int[][] graph) {
-        Set<Integer> visited = new HashSet<>();
+        int n = graph.length;
+        int[] colors = new int[n]; // 0: not colored, 1: color 1, -1: color -1
 
-
-        Stack<Integer> nodes = new Stack<>();
-        for (int i = 0; i < graph.length; i++) {
-            if (graph[i].length != 0 && !visited.contains(i)) {
-                nodes.push(i);
-                Set<Integer> firstSet = new HashSet<>();
-                Set<Integer> secondSet = new HashSet<>();
-                int switcher = 1;
-                while (!nodes.isEmpty()) {
-                    int current = nodes.pop();
-                    visited.add(current);
-                    if (switcher == 1) {
-                        firstSet.add(current);
-                        for (int j = 0; j < graph[current].length; j++) {
-                            if (firstSet.contains(graph[current][j])) {
-                                return false;
-                            }
-                        }
-                        switcher *= -1;
-                    } else if (switcher == -1) {
-                        secondSet.add(current);
-                        for (int j = 0; i < graph[current].length; i++) {
-                            if (secondSet.contains(graph[current][i])) {
-                                return false;
-                            }
-                        }
-                        switcher *= -1;
-                    }
-                    for (int j = 0; j < graph[current].length; j++) {
-                        if (!visited.contains(graph[current][j])) {
-                            nodes.push(graph[current][j]);
-                        }
-                    }
+        for (int i = 0; i < n; i++) {
+            if (colors[i] == 0) { // Node not colored
+                if (!dfs(graph, i, 1, colors)) {
+                    return false;
                 }
             }
         }
 
+        return true;
+    }
+
+    private boolean dfs(int[][] graph, int node, int color, int[] colors) {
+        colors[node] = color;
+
+        for (int neighbor : graph[node]) {
+            if (colors[neighbor] == color) {
+                return false; // Conflict in colors
+            }
+            if (colors[neighbor] == 0 && !dfs(graph, neighbor, -color, colors)) {
+                return false; // Recursive call with the opposite color
+            }
+        }
 
         return true;
     }
